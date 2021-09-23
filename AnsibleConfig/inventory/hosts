@@ -1,0 +1,17 @@
+[all]
+
+[all:children]
+webservers
+
+[myblog]
+ec2-18-118-208-194.us-east-2.compute.amazonaws.com ansible_user=ec2-user
+
+[webservers]
+18.222.165.39 ansible_user=centos
+18.224.246.213 ansible_user=centos
+18.222.208.55 ansible_user=centos
+3.138.192.156 ansible_user=centos
+ec2-18-118-208-194.us-east-2.compute.amazonaws.com ansible_user=ec2-user
+
+[stupid]
+nicks-blog.woofbit.com ansible_user=centos

@@ -1,0 +1,44 @@
+---
+- name: Sets up git on host, then updates WebServer from prod branch.
+  hosts: myblog
+#
+#  hosts: webservers
+#  hosts: 18.222.208.55
+#  hosts: 18.222.165.39
+#  
+
+  become: true
+  tasks:
+  - name: Setup for Git
+    block:
+      - name: Installs git package
+        package:
+          name: git
+          state: present
+      - name: Tell the host about a server we want it to connect to
+        known_hosts:
+          path: /etc/ssh/ssh_known_hosts
+          name: github.com
+          key: "{{ lookup('file', 'pubkeys/github.com.pub') }}"
+    tags:
+      - setup
+      - all
+      - update
+
+  - name: Key placement, GitHub Repo for Blog
+    block: 
+    - name: Places private half of DeployKey on WebServer
+      copy:
+        src: pubkeys/WebServerDeployKey
+        dest: ~/.ssh/
+        mode: '0400'
+    - name: Gets a checkout from the private GitHub Repo
+      git:
+        repo: git@github.com:Fryro/WebServer.git
+        dest: ~/GitRepo/
+        key_file: /root/.ssh/WebServerDeployKey
+    - name: Copies output of Pelican [GitRepo -> /var/www/html/]
+      shell:
+        cmd: cp -R  /root/GitRepo/Blog/output/* /var/www/html/ 
+    tags:
+      - my_blog

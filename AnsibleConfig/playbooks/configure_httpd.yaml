@@ -1,0 +1,37 @@
+---
+- name: This sets up a webserver
+  hosts: webservers
+  become: true
+  tasks:
+  - name: Install apache packages 
+    yum:
+      name: httpd
+      state: present
+  - name: Install Firewalld
+    package:
+      name: firewalld
+      state: present
+  - name: Install mod_ssl
+    package:
+      name: mod_ssl
+      state: present
+  - name: Ensure FirewallD is running
+    service:
+      name: firewalld
+      state: started
+  - name: ensure httpd is running
+    service:
+      name: httpd 
+      state: started
+  - name: Open port 80 for http access
+    firewalld:
+      service: http
+      permanent: true
+      immediate: true
+      state: enabled
+  - name: Open port 443 for HTTPS access
+    firewalld:
+      service: https
+      permanent: true
+      immediate: true
+      state: enabled
